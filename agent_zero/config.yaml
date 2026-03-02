@@ -1,5 +1,5 @@
 name: Agent Zero
-version: "1.0.7"
+version: "1.0.8"
 slug: agent_zero
 description: AI Assistant - Autonomous agent framework
 arch:
@@ -23,14 +23,12 @@ options: {}
 schema: {}
 
 map:
-  - type: addon_config
+  - type: data
     read_only: false
-    path: /a0
+    path: /a0/usr
 
 hassio_api: true
 homeassistant_api: true
-
-schema: {}
 
 privileged:
   - SYS_ADMIN

@@ -50,7 +50,11 @@ The addon will automatically persist all your data including:
 - User profiles and configurations
 - API keys and LLM settings
 
-All data is stored in Home Assistant's add-on config directory (`/addon_configs/<slug>`) and mapped to Agent Zero's `/a0/usr` directory for full persistence across restarts and updates.
+All data is stored in Home Assistant's add-on data volume and mapped to Agent Zero's `/a0/usr` directory for full persistence across restarts and updates.
+
+> [!IMPORTANT]
+> Following the official Agent Zero documentation, the addon maps **only** `/a0/usr` for persistence.
+> Do **not** map the entire `/a0` directory, as it also contains application/runtime files and can cause upgrade or configuration issues.
 
 ## Sidebar Integration
 
@@ -144,9 +148,9 @@ If you see `exit status 137` or processes being killed in logs:
 
 ## Data Persistence
 
-**✅ Automatic Persistence:** All Agent Zero data is automatically persisted in Home Assistant's add-on config directory.
+**✅ Automatic Persistence:** All Agent Zero data is automatically persisted in Home Assistant's add-on data volume.
 
-The addon maps Home Assistant's `/addon_configs/<slug>` to Agent Zero's `/a0/usr` directory, which contains:
+The addon maps Home Assistant's persistent data volume to Agent Zero's `/a0/usr` directory, which contains:
 - **Memory:** Agent memory and conversation history
 - **Skills:** Custom uploaded skills (SKILL.md modules)
 - **Knowledge:** Knowledge base documents
