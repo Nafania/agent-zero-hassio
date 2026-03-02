@@ -19,3 +19,8 @@ This addon uses a wrapper approach:
 - Starts Agent Zero in a separate container
 
 This avoids the `build_from` limitation in Home Assistant addon builds.
+
+## Notes
+
+- GitHub device authentication (used by GitHub CLI/Copilot tooling inside the addon) is persisted across restarts.
+- If you authenticated once and still get prompted again, update to addon version `1.0.6` or newer and restart the addon once.

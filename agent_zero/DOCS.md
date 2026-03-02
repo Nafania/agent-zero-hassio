@@ -152,6 +152,13 @@ The addon maps Home Assistant's `/addon_configs/<slug>` to Agent Zero's `/a0/usr
 - **Knowledge:** Knowledge base documents
 - **Profiles:** Agent profiles and configurations
 - **Settings:** API keys, LLM provider settings, and preferences
+- **GitHub auth:** GitHub CLI/Copilot device auth session files
+
+Additionally, the addon persists `/root/.config` and sets:
+- `XDG_CONFIG_HOME=/a0/usr/.config`
+- `GH_CONFIG_DIR=/a0/usr/.config/gh`
+
+This ensures GitHub device login does not need to be repeated after addon restarts.
 
 **This data persists across:**
 - Addon restarts

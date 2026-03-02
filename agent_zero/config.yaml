@@ -1,5 +1,5 @@
 name: Agent Zero
-version: "1.0.5"
+version: "1.0.6"
 slug: agent_zero
 description: AI Assistant - Autonomous agent framework
 arch:
@@ -26,6 +26,9 @@ map:
   - type: addon_config
     read_only: false
     path: /a0
+  - type: addon_config
+    read_only: false
+    path: /root/.config
 
 hassio_api: true
 homeassistant_api: true
@@ -41,3 +44,5 @@ privileged:
 environment:
   A0_SET_searxng_server_enabled: "true"
   A0_SET_cloudflare_tunnel_enabled: "false"
+  XDG_CONFIG_HOME: "/a0/usr/.config"
+  GH_CONFIG_DIR: "/a0/usr/.config/gh"
