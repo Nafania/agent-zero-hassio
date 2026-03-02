@@ -5,7 +5,7 @@ app:
 configuration:
   extension_repositories:
     name: Extension repositories
-    description: One or more Git repository URLs containing Agent Zero extensions.
+    description: Git repository URLs containing Agent Zero extensions (separate multiple URLs with comma or new line).
   extensions_auto_install:
     name: Auto-install extension files
     description: Automatically copy extension files from configured repositories at startup.

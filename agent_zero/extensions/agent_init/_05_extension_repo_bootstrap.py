@@ -85,7 +85,8 @@ def _parse_repositories(value: Any) -> list[str]:
 		return list(dict.fromkeys(repos))
 
 	if isinstance(value, str):
-		parts = [x.strip() for x in value.split(",") if x.strip()]
+		normalized = value.replace("\n", ",").replace(";", ",")
+		parts = [x.strip() for x in normalized.split(",") if x.strip()]
 		return list(dict.fromkeys(parts))
 
 	return []

@@ -28,7 +28,7 @@ This addon now supports one or more **extension repositories** that are fetched 
 
 In the Home Assistant addon configuration, use:
 
-- `extension_repositories`: list of Git URLs
+- `extension_repositories`: Git URL(s) as text (separate multiple entries with comma or newline)
 - `extensions_auto_install`: copy extension files automatically (`true` by default)
 - `extensions_auto_run_installers`: execute repo installer script if present (`true` by default)
 - `extensions_auto_run_commands`: execute manifest startup commands (`false` by default, advanced)
@@ -36,8 +36,9 @@ In the Home Assistant addon configuration, use:
 Example configuration:
 
 ```yaml
-extension_repositories:
-	- https://github.com/Invernomut0/telegram_a0
+extension_repositories: |
+	https://github.com/Invernomut0/telegram_a0
+	https://github.com/example/another_agent0_extension
 extensions_auto_install: true
 extensions_auto_run_installers: true
 extensions_auto_run_commands: false
