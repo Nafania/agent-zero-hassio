@@ -1,3 +1,17 @@
 app:
   name: Agent Zero
   description: AI Assistant addon for Home Assistant
+
+configuration:
+  extension_repositories:
+    name: Extension repositories
+    description: One or more Git repository URLs containing Agent Zero extensions.
+  extensions_auto_install:
+    name: Auto-install extension files
+    description: Automatically copy extension files from configured repositories at startup.
+  extensions_auto_run_installers:
+    name: Auto-run installer scripts
+    description: If an extension repository contains an installer script, execute it automatically at startup.
+  extensions_auto_run_commands:
+    name: Auto-run manifest commands
+    description: Execute startup commands declared by extension manifests (advanced, use only with trusted repositories).

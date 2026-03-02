@@ -42,7 +42,37 @@ These tools are available in the addon container for development and debugging p
 
 ## Configuration
 
-**⚠️ IMPORTANT:** This addon has no configuration options. All settings (LLM provider, API keys, models, etc.) are configured directly in the Agent Zero web interface after starting the addon.
+LLM provider settings, API keys and model choices are still configured in the Agent Zero web UI, but the addon now exposes **extension repository options** in the Home Assistant configuration flow.
+
+### Extension repositories configuration
+
+Available addon options:
+
+- `extension_repositories` (list of git URLs)
+- `extensions_auto_install` (`true/false`)
+- `extensions_auto_run_installers` (`true/false`)
+- `extensions_auto_run_commands` (`true/false`, advanced)
+
+Example:
+
+```yaml
+extension_repositories:
+   - https://github.com/Invernomut0/telegram_a0
+extensions_auto_install: true
+extensions_auto_run_installers: true
+extensions_auto_run_commands: false
+```
+
+At addon startup, a built-in bootstrap extension does:
+
+1. clone/pull of each configured repository into `/a0/usr/extensions/repos/`
+2. installer execution when present (idempotent scripts recommended)
+3. fallback copy of `python/extensions/**` into `/a0/python/extensions/**`
+4. optional execution of `auto_run` commands declared in `agent0-extension.json`
+
+> [!WARNING]
+> `extensions_auto_run_commands` executes shell commands from repository manifests.
+> Enable this only for trusted repositories.
 
 The addon will automatically persist all your data including:
 - Agent memory and conversation history
