@@ -66,7 +66,7 @@ extensions_auto_run_commands: false
 extensions_debug: true
 ```
 
-At addon startup, a built-in bootstrap extension does:
+During Agent Zero `agent_init`, a built-in bootstrap extension does:
 
 1. clone/pull of each configured repository into `/a0/usr/extensions/repos/`
 2. installer execution when present (idempotent scripts recommended)
@@ -81,10 +81,9 @@ When `extensions_debug=true`, addon logs include:
 - installer selection and execution arguments
 - each `auto_run` command before execution and its outcome
 
-Extension repository bootstrap now runs during addon startup (before `run_ui.py`), so you will see logs immediately in Home Assistant addon logs, for example:
+Extension repository bootstrap runs via the `agent_init` hook, so addon logs include entries such as:
 
-- `Starting extension repository bootstrap...`
-- `[ext-repo-bootstrap] [startup] Starting extension bootstrap: ...`
+- `[ext-repo-bootstrap] [agent_init] Starting extension bootstrap: ...`
 - `[ext-repo-bootstrap] Cloned repository: ...` / `Updated repository: ...`
 - `[ext-repo-bootstrap] auto_run command #... executed ...`
 

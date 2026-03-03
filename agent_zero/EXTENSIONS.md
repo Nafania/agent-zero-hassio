@@ -44,7 +44,7 @@ Example:
 
 ## Automatic management rule
 
-At startup the addon bootstrapper:
+During Agent Zero `agent_init`, the addon bootstrapper:
 
 1. reads Home Assistant addon options from `/data/options.json`
 2. for each URL in `extension_repositories`, clone/pull repository in `/a0/usr/extensions/repos/<repo-name>`

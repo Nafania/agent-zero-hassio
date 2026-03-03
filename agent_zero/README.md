@@ -46,14 +46,14 @@ extensions_auto_run_commands: false
 extensions_debug: true
 ```
 
-At startup, the addon bootstrapper will:
+During Agent Zero `agent_init`, the bootstrap extension will:
 
 1. Clone/pull repositories into `/a0/usr/extensions/repos/<repo-name>`
 2. Run installer scripts when available (idempotent flow recommended)
 3. Fallback-copy Python extension files from `python/extensions/**` to `/a0/python/extensions/**`
 4. Optionally run `auto_run` commands declared in manifest `agent0-extension.json`
 
-You can verify this in addon logs right after startup via lines prefixed with `[ext-repo-bootstrap]`.
+You can verify this in addon logs via lines prefixed with `[ext-repo-bootstrap]` (invocation tag: `[agent_init]`).
 
 > Security note: only use trusted repositories. Enabling auto-run commands means arbitrary startup commands can be executed.
 

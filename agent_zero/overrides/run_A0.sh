@@ -3,13 +3,6 @@
 . "/ins/setup_venv.sh" "$@"
 . "/ins/copy_A0.sh" "$@"
 
-echo "Starting extension repository bootstrap..."
-if [ -f /a0/python/extensions/agent_init/_05_extension_repo_bootstrap.py ]; then
-    python /a0/python/extensions/agent_init/_05_extension_repo_bootstrap.py startup
-else
-    echo "[ext-repo-bootstrap] Bootstrap script not found at /a0/python/extensions/agent_init/_05_extension_repo_bootstrap.py"
-fi
-
 python /a0/prepare.py --dockerized=true
 # python /a0/preload.py --dockerized=true # no need to run preload if it's done during container build
 
