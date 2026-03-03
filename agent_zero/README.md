@@ -53,6 +53,8 @@ At startup, the addon bootstrapper will:
 3. Fallback-copy Python extension files from `python/extensions/**` to `/a0/python/extensions/**`
 4. Optionally run `auto_run` commands declared in manifest `agent0-extension.json`
 
+You can verify this in addon logs right after startup via lines prefixed with `[ext-repo-bootstrap]`.
+
 > Security note: only use trusted repositories. Enabling auto-run commands means arbitrary startup commands can be executed.
 
 For extension repo authoring rules, see `EXTENSIONS.md`.

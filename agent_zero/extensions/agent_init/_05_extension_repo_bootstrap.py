@@ -25,6 +25,7 @@ Repository conventions:
 from __future__ import annotations
 
 import json
+import sys
 import shutil
 import subprocess
 import threading
@@ -327,41 +328,55 @@ class ExtensionRepositoryBootstrapExtension(Extension):
 				return None
 			ExtensionRepositoryBootstrapExtension._started = True
 
-		options = _read_options()
-		debug_enabled = _to_bool(options.get("extensions_debug"), False)
-		_debug(debug_enabled, f"Loaded options keys: {sorted(list(options.keys()))}")
-		repositories = _parse_repositories(options.get("extension_repositories"), debug_enabled=debug_enabled)
-		auto_install = _to_bool(options.get("extensions_auto_install"), True)
-		auto_run_installers = _to_bool(options.get("extensions_auto_run_installers"), True)
-		auto_run_commands = _to_bool(options.get("extensions_auto_run_commands"), False)
-		_debug(debug_enabled, f"auto flags -> install={auto_install} installers={auto_run_installers} run_commands={auto_run_commands}")
+		run_bootstrap(invocation="agent_init")
+		return None
 
-		if not repositories:
-			_log("No extension repositories configured")
-			return None
 
-		_log(
-			f"Starting extension bootstrap: repos={len(repositories)} "
-			f"auto_install={auto_install} "
-			f"auto_run_installers={auto_run_installers} "
-			f"auto_run_commands={auto_run_commands} "
-			f"debug={debug_enabled}"
+def run_bootstrap(invocation: str = "startup") -> None:
+	options = _read_options()
+	debug_enabled = _to_bool(options.get("extensions_debug"), False)
+	_debug(debug_enabled, f"[{invocation}] Loaded options keys: {sorted(list(options.keys()))}")
+	repositories = _parse_repositories(options.get("extension_repositories"), debug_enabled=debug_enabled)
+	auto_install = _to_bool(options.get("extensions_auto_install"), True)
+	auto_run_installers = _to_bool(options.get("extensions_auto_run_installers"), True)
+	auto_run_commands = _to_bool(options.get("extensions_auto_run_commands"), False)
+	_debug(
+		debug_enabled,
+		f"[{invocation}] auto flags -> install={auto_install} installers={auto_run_installers} run_commands={auto_run_commands}",
+	)
+
+	if not repositories:
+		_log(f"[{invocation}] No extension repositories configured")
+		return
+
+	_log(
+		f"[{invocation}] Starting extension bootstrap: repos={len(repositories)} "
+		f"auto_install={auto_install} "
+		f"auto_run_installers={auto_run_installers} "
+		f"auto_run_commands={auto_run_commands} "
+		f"debug={debug_enabled}"
+	)
+
+	for repo_url in repositories:
+		cleaned = repo_url.strip()
+		if not cleaned:
+			continue
+		if not cleaned.startswith(("https://", "http://", "git@")):
+			_log(f"[{invocation}] Skipping invalid repository URL: {cleaned}")
+			continue
+		_process_repository(
+			repo_url=cleaned,
+			auto_install=auto_install,
+			auto_run_installers=auto_run_installers,
+			auto_run_commands=auto_run_commands,
+			debug_enabled=debug_enabled,
 		)
 
-		for repo_url in repositories:
-			cleaned = repo_url.strip()
-			if not cleaned:
-				continue
-			if not cleaned.startswith(("https://", "http://", "git@")):
-				_log(f"Skipping invalid repository URL: {cleaned}")
-				continue
-			_process_repository(
-				repo_url=cleaned,
-				auto_install=auto_install,
-				auto_run_installers=auto_run_installers,
-				auto_run_commands=auto_run_commands,
-				debug_enabled=debug_enabled,
-			)
+	_log(f"[{invocation}] Extension bootstrap completed")
 
-		_log("Extension bootstrap completed")
-		return None
+
+if __name__ == "__main__":
+	invocation = "startup"
+	if len(sys.argv) > 1 and sys.argv[1].strip():
+		invocation = sys.argv[1].strip()
+	run_bootstrap(invocation=invocation)
