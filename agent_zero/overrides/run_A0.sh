@@ -72,16 +72,35 @@ if not p.exists():
     print('[cors-patch] run_ui.py not found – skipping', file=sys.stderr)
     sys.exit(0)
 content = p.read_text()
+
+# Target: comma BEFORE the comment so Python sees it as a valid argument separator
+CORRECT = 'cors_allowed_origins="*",  # HA addon: allow local network access'
+
+if CORRECT in content:
+    print('[cors-patch] Already correctly patched – no changes needed')
+    sys.exit(0)
+
+# Case 1: original lambda form (trailing comma is part of the matched pattern)
 patched = re.sub(
-    r'cors_allowed_origins\s*=\s*lambda[^\n]+validate_ws_origin\(environ\)\[0\]',
-    'cors_allowed_origins="*"  # HA addon: allow local network access',
+    r'cors_allowed_origins\s*=\s*lambda[^\n]+validate_ws_origin\(environ\)\[0\],',
+    CORRECT,
     content,
 )
+
+# Case 2: broken form from previous patch run – comma ended up after the comment
+# e.g.  cors_allowed_origins="*"  # HA addon: ...,
+if patched == content:
+    patched = re.sub(
+        r'cors_allowed_origins\s*=\s*"[^"]*"\s+#[^\n]+,',
+        CORRECT,
+        content,
+    )
+
 if patched != content:
     p.write_text(patched)
     print('[cors-patch] Applied: cors_allowed_origins set to "*" for local network access')
 else:
-    print('[cors-patch] Already patched or pattern not found – no changes')
+    print('[cors-patch] Pattern not found – no changes')
 CORS_PATCH
 # ---------------------------------------------------------------------------
 
