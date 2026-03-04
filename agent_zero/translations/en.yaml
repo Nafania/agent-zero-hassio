@@ -3,6 +3,9 @@ app:
   description: AI Assistant addon for Home Assistant
 
 configuration:
+  agent_zero_branch:
+    name: Agent Zero branch
+    description: "Which Agent Zero branch to run. 'main' uses the stable release baked into the image (default). 'development' clones the latest development branch from GitHub at every startup — slower boot, bleeding-edge features."
   extension_repositories:
     name: Extension repositories
     description: Array of Git repository URLs containing Agent Zero extensions.

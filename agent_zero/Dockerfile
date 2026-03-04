@@ -1,8 +1,8 @@
 # Extend official Agent Zero image (already includes Node.js and Python)
 FROM agent0ai/agent-zero:latest
 
-# Install dependencies for Bun
-RUN apt-get update && apt-get install -y unzip git ca-certificates && rm -rf /var/lib/apt/lists/*
+# Install dependencies for Bun and branch-selector (rsync used to overlay /a0)
+RUN apt-get update && apt-get install -y unzip git ca-certificates rsync && rm -rf /var/lib/apt/lists/*
 
 # Install Bun
 RUN curl -fsSL https://bun.sh/install | bash

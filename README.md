@@ -1,9 +1,9 @@
 # Agent Zero — Home Assistant Addon Repository
 
-> **v1.3.0** | Autonomous AI agent framework as a fully managed Home Assistant addon
+> **v1.4.0** | Autonomous AI agent framework as a fully managed Home Assistant addon
 
 [![HA Addon](https://img.shields.io/badge/Home%20Assistant-Addon-blue?logo=home-assistant)](https://github.com/Invernomut0/agent-zero-hassio)
-[![Version](https://img.shields.io/badge/version-1.3.0-green)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.4.0-green)](CHANGELOG.md)
 [![Arch](https://img.shields.io/badge/arch-amd64%20%7C%20aarch64-lightgrey)](#)
 
 ---
@@ -74,6 +74,23 @@ See [EXTENSIONS.md](agent_zero/EXTENSIONS.md) for the full authoring specificati
 
 ---
 
+## Branch selection
+
+From v1.4.0 you can choose which Agent Zero branch to run via the `agent_zero_branch` option:
+
+| Value | Behaviour |
+|---|---|
+| `"main"` *(default)* | Uses the stable release baked into `agent0ai/agent-zero:latest` — fast startup, no network needed |
+| `"development"` | Clones/updates the [`development` branch](https://github.com/agent0ai/agent-zero/tree/development) from GitHub at every startup and overlays `/a0` — bleeding-edge features, slightly slower boot |
+
+> If the GitHub clone fails (e.g. no network), the addon falls back to the `main` image automatically.
+
+```yaml
+agent_zero_branch: "development"
+```
+
+---
+
 ## Documentation
 
 | Document | Audience | Description |
@@ -87,6 +104,9 @@ See [EXTENSIONS.md](agent_zero/EXTENSIONS.md) for the full authoring specificati
 ---
 
 ## Changelog highlights
+
+### v1.4.0 — 2026-03-04
+Branch selector: nuova opzione `agent_zero_branch` per scegliere tra `main` (stable) e `development` (bleeding-edge da GitHub).
 
 ### v1.3.0 — 2026-03-03
 **Breaking:** Extension bootstrap is now invoked exclusively via the `agent_init` hook.

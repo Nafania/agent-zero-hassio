@@ -7,6 +7,17 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.0] - 2026-03-04
+
+### Added
+
+- **Branch selector** — new addon option `agent_zero_branch` (values: `"main"` | `"development"`, default `"main"`).
+  - `"main"`: uses the stable Agent Zero release already baked into the base image (`agent0ai/agent-zero:latest`). No extra download at startup.
+  - `"development"`: on every startup, clones/updates the [development branch](https://github.com/agent0ai/agent-zero/tree/development) from GitHub and overlays `/a0` via `rsync` before launching Agent Zero. Falls back to `"main"` gracefully if the network is unavailable.
+- `rsync` added to Dockerfile dependencies (required for the overlay step).
+
+---
+
 ## [1.3.0] - 2026-03-03
 
 ### Breaking Changes
