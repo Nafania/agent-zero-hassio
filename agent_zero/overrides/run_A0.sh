@@ -51,14 +51,50 @@ else
 fi
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# CORS patch: allow all origins for Socket.IO
+#
+# Root cause: when accessed directly via local IP (e.g. http://10.0.0.50:50001),
+# the browser does NOT send the Origin header for same-origin XHR GET requests
+# (Socket.IO HTTP long-polling). Agent Zero's validate_ws_origin() returns
+# (False, "missing_origin") and Socket.IO responds 400 to every polling request,
+# causing the "Invalid HTTP request received." error in the browser.
+# Tailscale works because the page is loaded cross-origin (HA frontend HTTPS vs
+# Agent Zero HTTP), so the browser does send Origin.
+#
+# Fix: replace the origin-validation lambda with cors_allowed_origins="*".
+# Security is handled by HA authentication; CORS enforcement is redundant here.
+# ---------------------------------------------------------------------------
+python3 << 'CORS_PATCH'
+import re, pathlib, sys
+p = pathlib.Path('/a0/run_ui.py')
+if not p.exists():
+    print('[cors-patch] run_ui.py not found – skipping', file=sys.stderr)
+    sys.exit(0)
+content = p.read_text()
+patched = re.sub(
+    r'cors_allowed_origins\s*=\s*lambda[^\n]+validate_ws_origin\(environ\)\[0\]',
+    'cors_allowed_origins="*"  # HA addon: allow local network access',
+    content,
+)
+if patched != content:
+    p.write_text(patched)
+    print('[cors-patch] Applied: cors_allowed_origins set to "*" for local network access')
+else:
+    print('[cors-patch] Already patched or pattern not found – no changes')
+CORS_PATCH
+# ---------------------------------------------------------------------------
+
 python /a0/prepare.py --dockerized=true
 # python /a0/preload.py --dockerized=true # no need to run preload if it's done during container build
 
 echo "Starting A0..."
-exec python /a0/run_ui.py \
+# Pipe output through a filter to suppress harmless Uvicorn TCP-probe warnings
+# emitted by the HA Supervisor health-check (raw TCP connect without an HTTP request).
+python /a0/run_ui.py \
     --dockerized=true \
     --port=80 \
-    --host="0.0.0.0"
+    --host="0.0.0.0" 2>&1 | grep -v "WARNING:  Invalid HTTP request received\."
     # --code_exec_ssh_enabled=true \
     # --code_exec_ssh_addr="localhost" \
     # --code_exec_ssh_port=22 \

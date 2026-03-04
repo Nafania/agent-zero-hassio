@@ -7,6 +7,16 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.1] - 2026-03-04
+
+### Fixed
+
+- **"Invalid HTTP request received." / 400 errors when accessing from local network** (e.g. `http://10.0.0.x:50001`).
+  - **Root cause**: Agent Zero's `validate_ws_origin()` rejects Socket.IO HTTP long-polling requests when the browser does not include an `Origin` header. For same-origin direct access (local IP, no HA proxy), Chrome/Firefox do not send `Origin` on XHR GET requests → origin check fails with `missing_origin` → Socket.IO returns 400 for all polling requests → frontend displays "Invalid HTTP request received." Tailscale/HA-proxy access worked because it is cross-origin (browser always sends `Origin`).
+  - **Fix**: a startup patch in `run_A0.sh` replaces the validation lambda in `run_ui.py` with `cors_allowed_origins="*"`. In the HA addon context, security relies on HA authentication; Socket.IO CORS enforcement is redundant and breaks direct local access.
+
+---
+
 ## [1.4.0] - 2026-03-04
 
 ### Added

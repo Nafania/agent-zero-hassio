@@ -1,9 +1,9 @@
 # Agent Zero — Home Assistant Addon Repository
 
-> **v1.4.0** | Autonomous AI agent framework as a fully managed Home Assistant addon
+> **v1.4.1** | Autonomous AI agent framework as a fully managed Home Assistant addon
 
 [![HA Addon](https://img.shields.io/badge/Home%20Assistant-Addon-blue?logo=home-assistant)](https://github.com/Invernomut0/agent-zero-hassio)
-[![Version](https://img.shields.io/badge/version-1.4.0-green)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.4.1-green)](CHANGELOG.md)
 [![Arch](https://img.shields.io/badge/arch-amd64%20%7C%20aarch64-lightgrey)](#)
 
 ---
@@ -104,6 +104,9 @@ agent_zero_branch: "development"
 ---
 
 ## Changelog highlights
+
+### v1.4.1 — 2026-03-04
+Fix accesso da rete locale: patch CORS a runtime (`cors_allowed_origins="*"`) per risolvere "Invalid HTTP request received." causato da missing `Origin` header nelle richieste Socket.IO same-origin.
 
 ### v1.4.0 — 2026-03-04
 Branch selector: nuova opzione `agent_zero_branch` per scegliere tra `main` (stable) e `development` (bleeding-edge da GitHub).
