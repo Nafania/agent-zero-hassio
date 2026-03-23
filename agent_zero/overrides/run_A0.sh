@@ -166,10 +166,12 @@ python /a0/prepare.py --dockerized=true
 echo "Starting A0..."
 # Pipe output through a filter to suppress harmless Uvicorn TCP-probe warnings
 # emitted by the HA Supervisor health-check (raw TCP connect without an HTTP request).
-python /a0/run_ui.py \
+# --line-buffered ensures each line is forwarded immediately (no buffering delay)
+# so time-sensitive output like GitHub device auth codes appears in real time.
+PYTHONUNBUFFERED=1 python /a0/run_ui.py \
     --dockerized=true \
     --port=80 \
-    --host="0.0.0.0" 2>&1 | grep -v "WARNING:  Invalid HTTP request received\."
+    --host="0.0.0.0" 2>&1 | grep --line-buffered -v "WARNING:  Invalid HTTP request received\."
     # --code_exec_ssh_enabled=true \
     # --code_exec_ssh_addr="localhost" \
     # --code_exec_ssh_port=22 \

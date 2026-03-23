@@ -7,6 +7,16 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.11] - 2026-03-23
+
+### Fixed
+
+- **GitHub device auth code not visible in real time** (appeared only on error).
+  - **Root cause**: `python run_ui.py 2>&1 | grep -v ...` introduces pipe buffering. Python's stdout is block-buffered when not connected to a TTY, so output (including "Please visit github.com/login/device and enter code XXXX") is held in a buffer and only flushed when the buffer fills or the process errors.
+  - **Fix**: added `PYTHONUNBUFFERED=1` (forces Python to flush every write immediately) and `grep --line-buffered` (forces grep to pass each line through without accumulating). Auth codes now appear instantly in the HA addon logs.
+
+---
+
 ## [1.4.10] - 2026-03-23
 
 ### Fixed
