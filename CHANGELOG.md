@@ -7,6 +7,17 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.2] - 2026-03-23
+
+### Fixed
+
+- **`ModuleNotFoundError: No module named 'giturlparse'`** when using the `development` branch.
+  - **Root cause**: the `development` branch of agent-zero added `giturlparse` as a dependency in `helpers/git.py`, but the package was not present in the base image.
+  - **Fix (Dockerfile)**: added `RUN python3 -m pip install --no-cache-dir giturlparse` at build time (using `python3 -m pip` because the base image does not expose `pip` in `$PATH`).
+  - **Fix (run_A0.sh)**: after rsyncing the development branch, `python3 -m pip install -r /a0/requirements.txt` is executed to catch any future new dependencies automatically.
+
+---
+
 ## [1.4.1] - 2026-03-04
 
 ### Fixed

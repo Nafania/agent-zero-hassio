@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y unzip git ca-certificates rsync && rm -
 
 # Pre-install Python packages required by the development branch of agent-zero
 # (e.g. giturlparse used by helpers/git.py – missing from the base image)
-RUN pip install --no-cache-dir giturlparse
+RUN python3 -m pip install --no-cache-dir giturlparse
 
 # Install Bun
 RUN curl -fsSL https://bun.sh/install | bash

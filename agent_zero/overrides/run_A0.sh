@@ -49,7 +49,7 @@ if [ "$A0_BRANCH" = "development" ]; then
         # Install any new Python dependencies introduced by the development branch
         if [ -f "/a0/requirements.txt" ]; then
             echo "[branch-selector] Installing development requirements..."
-            pip install --quiet -r /a0/requirements.txt 2>&1 | tail -5 || true
+            python3 -m pip install --quiet -r /a0/requirements.txt 2>&1 | tail -5 || true
         fi
     fi
 else
