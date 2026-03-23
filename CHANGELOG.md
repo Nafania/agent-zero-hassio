@@ -7,6 +7,16 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.9] - 2026-03-23
+
+### Fixed
+
+- **User configurations wiped on every restart** when using the `development` branch.
+  - **Root cause**: `rsync -a --delete` syncs the git repository onto `/a0`, and `--delete` removes any file in the destination that is not in the source. Agent Zero stores user data (memory, settings, working files, .env) in subdirectories of `/a0` that do not exist in the repository → they were deleted on every sync.
+  - **Fix**: added `--exclude` flags for all user-data directories: `memory/`, `work_dir/`, `data/`, `logs/`, `tmp/`, and `.env`. These are preserved across restarts while application code is still fully updated from the branch.
+
+---
+
 ## [1.4.8] - 2026-03-23
 
 ### Fixed
