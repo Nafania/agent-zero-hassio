@@ -7,6 +7,16 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.6] - 2026-03-23
+
+### Fixed
+
+- **`ModuleNotFoundError: No module named 'watchdog'`** persisted despite constraints-based install (v1.4.5).
+  - **Root cause**: using `pip install -r requirements.txt -c constraints.txt` fails **entirely** when any single package (e.g. `lxml_html_clean`) has a dependency conflict — pip aborts before reaching `watchdog` and other needed packages.
+  - **Fix**: replaced the constraints approach with a per-package install loop (Python script). Each package from `requirements.txt` is installed individually only if not already present (`pip show` check). Conflicts on individual packages are warned and skipped, but do not block installation of the remaining packages.
+
+---
+
 ## [1.4.5] - 2026-03-23
 
 ### Fixed

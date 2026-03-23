@@ -52,15 +52,35 @@ if [ "$A0_BRANCH" = "development" ]; then
         find /a0 -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
 
         # Install packages required by the development branch without upgrading
-        # anything already present in the venv (use current state as constraints).
+        # anything already present in the venv. Each package is handled
+        # individually so one conflict doesn't block all others.
         if [ -f "/a0/requirements.txt" ]; then
             echo "[branch-selector] Installing new development requirements (no upgrades)..."
-            pip freeze > /tmp/pip_constraints.txt
-            pip install --quiet \
-                -r /a0/requirements.txt \
-                -c /tmp/pip_constraints.txt 2>&1 \
-                | grep -v "already satisfied" | tail -10 || true
-            rm -f /tmp/pip_constraints.txt
+            python3 << 'INSTALL_DEPS'
+import subprocess, re, sys
+
+with open('/a0/requirements.txt') as f:
+    reqs = f.readlines()
+
+for req in reqs:
+    req = req.strip()
+    if not req or req.startswith('#') or req.startswith('-'):
+        continue
+    pkg_name = re.split(r'[>=<!;\[ ]', req)[0].strip().lower().replace('-', '_')
+    if not pkg_name:
+        continue
+    # Skip if already installed
+    if subprocess.run(['pip', 'show', pkg_name], capture_output=True).returncode == 0:
+        continue
+    result = subprocess.run(
+        ['pip', 'install', '--quiet', req],
+        capture_output=True, text=True
+    )
+    if result.returncode == 0:
+        print(f"[branch-selector] Installed: {pkg_name}")
+    else:
+        print(f"[branch-selector] Skipped (conflict): {pkg_name}", file=sys.stderr)
+INSTALL_DEPS
         fi
 
         echo "[branch-selector] Development branch active."
