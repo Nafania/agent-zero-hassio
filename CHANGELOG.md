@@ -7,6 +7,16 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.5] - 2026-03-23
+
+### Fixed
+
+- **`ModuleNotFoundError: No module named 'watchdog'`** (and future missing packages) when using the `development` branch.
+  - **Root cause**: the `development` branch adds new Python packages over time (`giturlparse`, `watchdog`, …) that are not in the base image's venv. Installing the full `requirements.txt` naively causes upgrade conflicts; skipping it leaves new packages missing.
+  - **Fix**: after rsync, run `pip install -r /a0/requirements.txt` but pass the current venv state as a **constraints file** (`pip freeze > /tmp/pip_constraints.txt`). This installs any new packages while preventing upgrades to packages already present, avoiding dependency conflicts (e.g. `openai` version pinned by `litellm`).
+
+---
+
 ## [1.4.4] - 2026-03-23
 
 ### Fixed

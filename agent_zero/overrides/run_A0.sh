@@ -51,6 +51,18 @@ if [ "$A0_BRANCH" = "development" ]; then
         # Clear stale bytecode so Python picks up new source files
         find /a0 -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
 
+        # Install packages required by the development branch without upgrading
+        # anything already present in the venv (use current state as constraints).
+        if [ -f "/a0/requirements.txt" ]; then
+            echo "[branch-selector] Installing new development requirements (no upgrades)..."
+            pip freeze > /tmp/pip_constraints.txt
+            pip install --quiet \
+                -r /a0/requirements.txt \
+                -c /tmp/pip_constraints.txt 2>&1 \
+                | grep -v "already satisfied" | tail -10 || true
+            rm -f /tmp/pip_constraints.txt
+        fi
+
         echo "[branch-selector] Development branch active."
     fi
 else
