@@ -49,7 +49,6 @@ if [ "$A0_BRANCH" = "development" ]; then
         echo "[branch-selector] Applying development files to /a0 ..."
         rsync -a --delete \
             --exclude='.git' \
-            --exclude='usr' \
             "$A0_SRC/" /a0/
 
         # Clear stale bytecode so Python picks up new source files

@@ -7,6 +7,16 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.8] - 2026-03-23
+
+### Fixed
+
+- **`FileNotFoundError: '/a0/usr/plugins'`** when starting `run_ui.py` with the `development` branch.
+  - **Root cause**: the original `rsync` excluded the `usr` directory (`--exclude='usr'`) to avoid overwriting base-image OS files. The `development` branch of agent-zero moved plugins to `/a0/usr/plugins/`, which was silently dropped by rsync → directory didn't exist at startup.
+  - **Fix**: removed `--exclude='usr'` from rsync. `/a0/usr` is agent-zero's own application directory, not the system `/usr`; it must be fully synced from the development branch.
+
+---
+
 ## [1.4.7] - 2026-03-23
 
 ### Fixed
