@@ -7,6 +7,15 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.13.1] - 2026-05-07
+
+### Fixed
+
+- **Addon startup now delegates back to Agent Zero's official bootstrap manager** after HA-specific preflight steps. This keeps the addon aligned with upstream `self_update_manager.py docker-run-ui` startup behavior while preserving addon fixes for persistent `/a0/tmp`, plugin dependency restoration, branch selection, and CORS patching.
+- **Built-in extension bootstrap path updated for Agent Zero v1.13** — the addon now installs its `agent_init` extension under `/a0/extensions/python/...`, matching upstream extension discovery.
+
+---
+
 ## [1.4.12] - 2026-04-13
 
 ### Fixed

@@ -196,23 +196,9 @@ if [ -d "/a0/usr/plugins" ]; then
     fi
 fi
 
-# Environment is ready: restart run_tunnel_api now that deps are installed
+# Environment is ready: restart run_tunnel_api now that deps are installed.
 supervisorctl start run_tunnel_api 2>/dev/null || true
 
-python /a0/prepare.py --dockerized=true
-# python /a0/preload.py --dockerized=true # no need to run preload if it's done during container build
-
-echo "Starting A0..."
-# Pipe output through a filter to suppress harmless Uvicorn TCP-probe warnings
-# emitted by the HA Supervisor health-check (raw TCP connect without an HTTP request).
-# --line-buffered ensures each line is forwarded immediately (no buffering delay)
-# so time-sensitive output like GitHub device auth codes appears in real time.
-PYTHONUNBUFFERED=1 python /a0/run_ui.py \
-    --dockerized=true \
-    --port=80 \
-    --host="0.0.0.0" 2>&1 | grep --line-buffered -v "WARNING:  Invalid HTTP request received\."
-    # --code_exec_ssh_enabled=true \
-    # --code_exec_ssh_addr="localhost" \
-    # --code_exec_ssh_port=22 \
-    # --code_exec_ssh_user="root" \
-    # --code_exec_ssh_pass="toor"
+echo "Starting A0 bootstrap manager..."
+export PYTHONUNBUFFERED=1
+exec python /exe/self_update_manager.py docker-run-ui
