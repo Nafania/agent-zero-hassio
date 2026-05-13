@@ -120,9 +120,9 @@ fi
 # ---------------------------------------------------------------------------
 python3 << 'CORS_PATCH'
 import re, pathlib, sys
-p = pathlib.Path('/a0/run_ui.py')
+p = pathlib.Path('/a0/helpers/ui_server.py')
 if not p.exists():
-    print('[cors-patch] run_ui.py not found – skipping', file=sys.stderr)
+    print('[cors-patch] helpers/ui_server.py not found – skipping', file=sys.stderr)
     sys.exit(0)
 content = p.read_text()
 

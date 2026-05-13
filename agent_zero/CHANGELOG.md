@@ -7,6 +7,16 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.14] - 2026-05-13
+
+### Fixed
+
+- **Aligned addon version with Agent Zero v1.14.**
+- **Updated the HA local-access CORS startup patch for Agent Zero v1.14** — Socket.IO setup now lives in `/a0/helpers/ui_server.py`, so the addon patches that file instead of the retired `/a0/run_ui.py` location.
+- **Reviewed v1.14 addon-impacting changes** — official startup still uses `self_update_manager.py docker-run-ui`, extension discovery still uses `/a0/extensions/python/...`, and the new Browser Playwright cache under `/a0/tmp/playwright` remains covered by the addon's persistent `/a0/tmp -> /a0/usr/tmp` mapping.
+
+---
+
 ## [1.13.1] - 2026-05-07
 
 ### Fixed
