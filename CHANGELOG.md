@@ -7,6 +7,14 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.14.2] - 2026-05-13
+
+### Fixed
+
+- **Plugin Hub runtime dependencies restored generically after addon restart** — the addon now handles all user plugins under `/a0/usr/plugins`, reinstalling `requirements.txt` dependencies and rerunning each plugin's upstream `hooks.install()` once per recreated container. Install-hook stamps are stored inside the ephemeral Agent Zero venv, so Home Assistant container recreation restores missing packages while repeated restarts in the same container skip unchanged hooks.
+
+---
+
 ## [1.14.1] - 2026-05-13
 
 ### Fixed

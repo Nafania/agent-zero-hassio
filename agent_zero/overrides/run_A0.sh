@@ -173,39 +173,137 @@ fi
 # ---------------------------------------------------------------------------
 # Plugin runtime dependency restoration
 # User-installed plugins may declare pip dependencies in requirements.txt.
-# The official Google Suite plugin instead installs its deps from initialize.py
-# during hooks.install(), so rerun that known dependency initializer as well.
+# Some Plugin Hub plugins install deps from hooks.install() instead.
 # Since the venv is ephemeral, restore those dependencies on every startup.
+# hook stamps live inside the ephemeral venv, so container recreation reruns
+# install hooks while repeated supervisor restarts in one container do not.
 # PIP_CACHE_DIR under /a0/usr makes subsequent installs near-instant.
 # ---------------------------------------------------------------------------
 export PIP_CACHE_DIR="/a0/usr/.pip-cache"
 mkdir -p "$PIP_CACHE_DIR"
 
 if [ -d "/a0/usr/plugins" ]; then
-    PLUGIN_RESTORE_COUNT=0
-    for plugin_dir in /a0/usr/plugins/*/; do
-        [ -d "$plugin_dir" ] || continue
-        plugin_name=$(basename "$plugin_dir")
-        plugin_restored=0
-        if [ -f "$plugin_dir/requirements.txt" ]; then
-            echo "[plugin-deps] Restoring pip dependencies for $plugin_name..."
-            pip install --quiet -r "$plugin_dir/requirements.txt" 2>&1 || \
-                echo "[plugin-deps] WARNING: Failed to restore deps for $plugin_name"
-            plugin_restored=1
-        fi
-        if [ "$plugin_name" = "google" ] && [ -f "$plugin_dir/initialize.py" ]; then
-            echo "[plugin-deps] Running Google dependency initializer..."
-            python "$plugin_dir/initialize.py" 2>&1 || \
-                echo "[plugin-deps] WARNING: Google dependency initializer failed"
-            plugin_restored=1
-        fi
-        if [ "$plugin_restored" -gt 0 ]; then
-            PLUGIN_RESTORE_COUNT=$((PLUGIN_RESTORE_COUNT + 1))
-        fi
-    done
-    if [ "$PLUGIN_RESTORE_COUNT" -gt 0 ]; then
-        echo "[plugin-deps] Restored runtime dependencies for $PLUGIN_RESTORE_COUNT plugin(s)"
-    fi
+    python - <<'PLUGIN_DEPS_RESTORE'
+from __future__ import annotations
+
+import ast
+import hashlib
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+RESTORE_SCHEMA = "hassio-plugin-restore-v2"
+PLUGIN_ROOT = Path("/a0/usr/plugins")
+STAMP_DIR = Path(sys.prefix) / ".hassio-plugin-restore"
+
+sys.path.insert(0, "/a0")
+os.chdir("/a0")
+
+
+def _safe_name(name: str) -> str:
+    return re.sub(r"[^A-Za-z0-9_.-]+", "_", name)
+
+
+def _has_install_hook(hooks_file: Path) -> bool:
+    if not hooks_file.exists():
+        return False
+    try:
+        tree = ast.parse(hooks_file.read_text(encoding="utf-8"))
+    except Exception:
+        return "def install" in hooks_file.read_text(encoding="utf-8", errors="ignore")
+    return any(
+        isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name == "install"
+        for node in tree.body
+    )
+
+
+def _dependency_fingerprint(plugin_dir: Path) -> str:
+    digest = hashlib.sha256()
+    digest.update(RESTORE_SCHEMA.encode())
+    patterns = [
+        "plugin.yaml",
+        "requirements*.txt",
+        "hooks.py",
+        "initialize.py",
+        "pyproject.toml",
+        "setup.py",
+        "**/package.json",
+    ]
+    seen: set[Path] = set()
+    for pattern in patterns:
+        for path in sorted(plugin_dir.glob(pattern)):
+            if not path.is_file() or path in seen:
+                continue
+            seen.add(path)
+            rel = path.relative_to(plugin_dir).as_posix()
+            digest.update(rel.encode())
+            digest.update(b"\0")
+            digest.update(path.read_bytes())
+            digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def _install_requirements(plugin_name: str, plugin_dir: Path) -> bool:
+    req = plugin_dir / "requirements.txt"
+    if not req.exists():
+        return False
+    print(f"[plugin-deps] Restoring pip dependencies for {plugin_name}...", flush=True)
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "install", "--quiet", "-r", str(req)],
+        text=True,
+    )
+    if result.returncode != 0:
+        print(
+            f"[plugin-deps] WARNING: Failed to restore deps for {plugin_name}",
+            flush=True,
+        )
+    return True
+
+
+def _run_install_hook(plugin_name: str, plugin_dir: Path) -> bool:
+    hooks_file = plugin_dir / "hooks.py"
+    if not _has_install_hook(hooks_file):
+        return False
+
+    STAMP_DIR.mkdir(parents=True, exist_ok=True)
+    fingerprint = _dependency_fingerprint(plugin_dir)
+    stamp = STAMP_DIR / f"{_safe_name(plugin_name)}.sha256"
+    if stamp.exists() and stamp.read_text(encoding="utf-8").strip() == fingerprint:
+        return False
+
+    print(f"[plugin-deps] Running install hook for {plugin_name}...", flush=True)
+    try:
+        from helpers import cache, plugins
+
+        cache.remove(plugins.HOOKS_CACHE_AREA, plugin_name)
+        plugins.call_plugin_hook(plugin_name, "install")
+        stamp.write_text(fingerprint, encoding="utf-8")
+    except Exception as exc:
+        print(
+            f"[plugin-deps] WARNING: Install hook failed for {plugin_name}: {exc}",
+            flush=True,
+        )
+    return True
+
+
+restored = 0
+for plugin_dir in sorted(PLUGIN_ROOT.iterdir(), key=lambda path: path.name):
+    if not plugin_dir.is_dir() or plugin_dir.name.startswith("."):
+        continue
+    plugin_name = plugin_dir.name
+    did_work = _install_requirements(plugin_name, plugin_dir)
+    did_work = _run_install_hook(plugin_name, plugin_dir) or did_work
+    restored += 1 if did_work else 0
+
+if restored:
+    print(
+        f"[plugin-deps] Restored runtime dependencies for {restored} plugin(s)",
+        flush=True,
+    )
+PLUGIN_DEPS_RESTORE
 fi
 
 # Environment is ready: restart run_tunnel_api now that deps are installed.
