@@ -7,6 +7,14 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.14.1] - 2026-05-13
+
+### Fixed
+
+- **Google Suite plugin dependencies restored after addon restart** — Plugin Hub installs the official `google` plugin into `/a0/usr/plugins/google`, but its Python packages are installed into the ephemeral Agent Zero venv through `initialize.py`/`hooks.install()`. The addon now reruns Google Suite's dependency initializer during startup, so packages such as `google-auth-oauthlib` are restored before Agent Zero starts while OAuth data remains persisted in `/a0/usr/plugins/google/data`.
+
+---
+
 ## [1.14] - 2026-05-13
 
 ### Fixed

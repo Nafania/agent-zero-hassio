@@ -171,9 +171,11 @@ if [ ! -L "/a0/tmp" ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# Plugin pip dependency restoration
+# Plugin runtime dependency restoration
 # User-installed plugins may declare pip dependencies in requirements.txt.
-# Since the venv is ephemeral, restore them on every startup.
+# The official Google Suite plugin instead installs its deps from initialize.py
+# during hooks.install(), so rerun that known dependency initializer as well.
+# Since the venv is ephemeral, restore those dependencies on every startup.
 # PIP_CACHE_DIR under /a0/usr makes subsequent installs near-instant.
 # ---------------------------------------------------------------------------
 export PIP_CACHE_DIR="/a0/usr/.pip-cache"
@@ -184,15 +186,25 @@ if [ -d "/a0/usr/plugins" ]; then
     for plugin_dir in /a0/usr/plugins/*/; do
         [ -d "$plugin_dir" ] || continue
         plugin_name=$(basename "$plugin_dir")
+        plugin_restored=0
         if [ -f "$plugin_dir/requirements.txt" ]; then
             echo "[plugin-deps] Restoring pip dependencies for $plugin_name..."
             pip install --quiet -r "$plugin_dir/requirements.txt" 2>&1 || \
                 echo "[plugin-deps] WARNING: Failed to restore deps for $plugin_name"
+            plugin_restored=1
+        fi
+        if [ "$plugin_name" = "google" ] && [ -f "$plugin_dir/initialize.py" ]; then
+            echo "[plugin-deps] Running Google dependency initializer..."
+            python "$plugin_dir/initialize.py" 2>&1 || \
+                echo "[plugin-deps] WARNING: Google dependency initializer failed"
+            plugin_restored=1
+        fi
+        if [ "$plugin_restored" -gt 0 ]; then
             PLUGIN_RESTORE_COUNT=$((PLUGIN_RESTORE_COUNT + 1))
         fi
     done
     if [ "$PLUGIN_RESTORE_COUNT" -gt 0 ]; then
-        echo "[plugin-deps] Restored dependencies for $PLUGIN_RESTORE_COUNT plugin(s)"
+        echo "[plugin-deps] Restored runtime dependencies for $PLUGIN_RESTORE_COUNT plugin(s)"
     fi
 fi
 
