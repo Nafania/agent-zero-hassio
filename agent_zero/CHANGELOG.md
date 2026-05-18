@@ -7,6 +7,15 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.15] - 2026-05-18
+
+### Fixed
+
+- **Aligned addon version with Agent Zero v1.15.**
+- **Reviewed v1.15 addon-impacting changes** — upstream changes focus on web UI markdown sanitization, the new built-in `_editor` plugin, Office surface cleanup, connector queue support, and browser polish. The addon startup path, Socket.IO CORS patch target, plugin discovery path, and persistent `/a0/tmp -> /a0/usr/tmp` mapping remain compatible.
+
+---
+
 ## [1.14.2] - 2026-05-13
 
 ### Fixed
