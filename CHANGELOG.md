@@ -7,6 +7,15 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.16] - 2026-05-22
+
+### Fixed
+
+- **Aligned addon version with Agent Zero v1.16.**
+- **Reviewed v1.16 addon-impacting changes** — upstream changes focus on built-in speech plugins (`_kokoro_tts`, `_whisper_stt`), timezone display preferences, ephemeral screenshot routing, model preset merging, plugin scanner/toggle behavior, skill visibility, editor/Office artifact routing, and browser recovery messaging. The addon startup path, Socket.IO CORS patch target, plugin dependency restoration, extension discovery path, and persistent `/a0/tmp -> /a0/usr/tmp` mapping remain compatible.
+
+---
+
 ## [1.15] - 2026-05-18
 
 ### Fixed

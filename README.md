@@ -1,9 +1,9 @@
 # Agent Zero — Home Assistant Addon Repository
 
-> **v1.4.1** | Autonomous AI agent framework as a fully managed Home Assistant addon
+> **v1.16** | Autonomous AI agent framework as a fully managed Home Assistant addon
 
 [![HA Addon](https://img.shields.io/badge/Home%20Assistant-Addon-blue?logo=home-assistant)](https://github.com/Invernomut0/agent-zero-hassio)
-[![Version](https://img.shields.io/badge/version-1.4.1-green)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.16-green)](CHANGELOG.md)
 [![Arch](https://img.shields.io/badge/arch-amd64%20%7C%20aarch64-lightgrey)](#)
 
 ---
@@ -37,7 +37,7 @@ This repository is a **Home Assistant addon repository** that packages [Agent Ze
 
 ```
 agent_zero/          # Addon folder
-├── config.yaml      # HA addon manifest (v1.3.0, ports, options, schema)
+├── config.yaml      # HA addon manifest (version, ports, options, schema)
 ├── Dockerfile       # Extends agent0ai/agent-zero:latest + Bun
 ├── README.md        # Developer / contributor documentation
 ├── DOCS.md          # End-user documentation (shown in HA addon store)
@@ -105,8 +105,11 @@ agent_zero_branch: "development"
 
 ## Changelog highlights
 
-### v1.4.1 — 2026-03-04
-Fix accesso da rete locale: patch CORS a runtime (`cors_allowed_origins="*"`) per risolvere "Invalid HTTP request received." causato da missing `Origin` header nelle richieste Socket.IO same-origin.
+### v1.16 — 2026-05-22
+Aligned addon version with Agent Zero v1.16; reviewed upstream speech plugin, timezone, screenshot routing, model preset, plugin, editor/Office artifact, and browser recovery changes for addon compatibility.
+
+### v1.15 — 2026-05-18
+Aligned addon version with Agent Zero v1.15; reviewed upstream UI, editor, connector queue, and browser changes for addon compatibility.
 
 ### v1.4.0 — 2026-03-04
 Branch selector: nuova opzione `agent_zero_branch` per scegliere tra `main` (stable) e `development` (bleeding-edge da GitHub).

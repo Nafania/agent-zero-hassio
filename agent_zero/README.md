@@ -1,6 +1,6 @@
 # Agent Zero — Home Assistant Addon
 
-> **Current version: 1.3.0** | [Changelog](../CHANGELOG.md)
+> **Current version: 1.16** | [Changelog](../CHANGELOG.md)
 
 Home Assistant addon that packages [Agent Zero](https://github.com/agent0ai/agent-zero) — an open-source, self-growing AI agent framework — as a fully managed HA addon.
 
