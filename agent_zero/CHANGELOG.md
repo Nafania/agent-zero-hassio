@@ -7,6 +7,15 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.17] - 2026-05-23
+
+### Fixed
+
+- **Aligned addon version with Agent Zero v1.17.**
+- **Reviewed v1.17 addon-impacting changes** — upstream changes focus on the `computer_use_remote` host desktop-control pipeline, visual verification, multimodal screenshot handling, host-vs-Xpra desktop routing, platform-specific computer-use skills, Codex OAuth proxy vision inputs, and prompt token accounting. The addon startup path, Socket.IO CORS patch target, plugin dependency restoration, extension discovery path, and persistent `/a0/tmp -> /a0/usr/tmp` mapping remain compatible.
+
+---
+
 ## [1.16] - 2026-05-22
 
 ### Fixed

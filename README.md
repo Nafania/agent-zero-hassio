@@ -1,9 +1,9 @@
 # Agent Zero — Home Assistant Addon Repository
 
-> **v1.16** | Autonomous AI agent framework as a fully managed Home Assistant addon
+> **v1.17** | Autonomous AI agent framework as a fully managed Home Assistant addon
 
 [![HA Addon](https://img.shields.io/badge/Home%20Assistant-Addon-blue?logo=home-assistant)](https://github.com/Invernomut0/agent-zero-hassio)
-[![Version](https://img.shields.io/badge/version-1.16-green)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.17-green)](CHANGELOG.md)
 [![Arch](https://img.shields.io/badge/arch-amd64%20%7C%20aarch64-lightgrey)](#)
 
 ---
@@ -104,6 +104,9 @@ agent_zero_branch: "development"
 ---
 
 ## Changelog highlights
+
+### v1.17 — 2026-05-23
+Aligned addon version with Agent Zero v1.17; reviewed upstream computer-use, host desktop-control, screenshot, OAuth vision-input, and token-accounting changes for addon compatibility.
 
 ### v1.16 — 2026-05-22
 Aligned addon version with Agent Zero v1.16; reviewed upstream speech plugin, timezone, screenshot routing, model preset, plugin, editor/Office artifact, and browser recovery changes for addon compatibility.
