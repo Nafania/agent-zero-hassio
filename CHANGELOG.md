@@ -7,6 +7,15 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.18] - 2026-05-26
+
+### Fixed
+
+- **Aligned addon version with Agent Zero v1.18.**
+- **Reviewed v1.18 addon-impacting changes** — upstream changes focus on configurable skills caps, MCP multimodal media handling, browser iframe/shadow-DOM support, chat composer sizing, self-update backup exclusions for transient SSH agent sockets, and skills modal styling. The addon startup path, Socket.IO CORS patch target, plugin dependency restoration, extension discovery path, upstream self-update delegation, and persistent `/a0/tmp -> /a0/usr/tmp` mapping remain compatible.
+
+---
+
 ## [1.17] - 2026-05-23
 
 ### Fixed
