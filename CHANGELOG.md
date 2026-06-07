@@ -7,6 +7,15 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.20] - 2026-06-04
+
+### Fixed
+
+- **Aligned addon version with Agent Zero v1.20.**
+- **Reviewed v1.19/v1.20 addon-impacting changes** — upstream changes include Remote Control tunnel refactoring, connector version handshakes, the standalone `_document_query` plugin, centralized root requirements, durable screenshot artifacts, Office/Desktop/Editor plugin toggle changes, OAuth provider/account updates, secure post-login redirects, WebSocket CSRF origin fixes, browser tab reuse guidance, and file-browser/editor polish. The addon startup path, Socket.IO CORS patch target, plugin dependency restoration, extension discovery path, upstream self-update delegation, and persistent `/a0/tmp -> /a0/usr/tmp` mapping remain compatible.
+
+---
+
 ## [1.18] - 2026-05-26
 
 ### Fixed
