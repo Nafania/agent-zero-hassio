@@ -106,7 +106,7 @@ agent_zero_branch: "development"
 ## Changelog highlights
 
 ### v1.20.1 — 2026-06-10
-Preserves Plugin Hub data during development-branch sync and pre-installs WhatsApp bridge dependencies for stable addon restarts.
+Preserves Plugin Hub data during development-branch sync and pre-installs bundled Node package dependencies for stable addon restarts.
 
 ### v1.18 — 2026-05-26
 Aligned addon version with Agent Zero v1.18; reviewed upstream skills-cap, MCP multimodal media, browser DOM-helper, chat composer, and self-update changes for addon compatibility.

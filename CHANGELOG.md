@@ -12,7 +12,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 ### Fixed
 
 - **Preserved Plugin Hub plugin data during development-branch sync** — the startup overlay no longer runs destructive `rsync --delete` against `/a0/usr/plugins`, where Plugin Hub stores user-installed plugins and Google Suite stores `data/token.json`.
-- **Pre-installed WhatsApp bridge dependencies in the addon image** — the built-in `_whatsapp_integration` bridge now has its Node dependencies baked into the image and restores the bundled cache after a matching development-branch overlay, avoiding repeated runtime `npm ci` attempts after Home Assistant recreates the addon container.
+- **Pre-installed bundled Node package dependencies in the addon image** — all repo-owned `package-lock.json` directories are installed at build time and restored to matching active `/a0` package directories after a development-branch overlay, avoiding repeated runtime `npm ci` attempts after Home Assistant recreates the addon container.
 
 ---
 

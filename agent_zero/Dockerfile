@@ -13,17 +13,21 @@ ENV PATH="/root/.bun/bin:${PATH}"
 # Verify installations
 RUN node --version && npm --version && bun --version
 
-# Pre-install the built-in WhatsApp bridge dependencies. In Home Assistant the
-# container filesystem is recreated on addon restart, and the bridge stops after
-# repeated runtime npm install failures. Baking node_modules into the image keeps
-# WhatsApp startup independent of npm/network availability.
-RUN if [ -f /a0/plugins/_whatsapp_integration/whatsapp-bridge/package-lock.json ]; then \
-        cd /a0/plugins/_whatsapp_integration/whatsapp-bridge && \
-        npm ci --omit=dev --no-audit --no-fund; \
-    elif [ -f /git/agent-zero/plugins/_whatsapp_integration/whatsapp-bridge/package-lock.json ]; then \
-        cd /git/agent-zero/plugins/_whatsapp_integration/whatsapp-bridge && \
-        npm ci --omit=dev --no-audit --no-fund; \
-    fi
+# Pre-install bundled Node package dependencies. In Home Assistant the container
+# filesystem is recreated on addon restart, so repo-owned Node packages should
+# not depend on runtime npm/network availability.
+RUN set -eu; \
+    find /git/agent-zero /a0 \
+        -path '*/node_modules' -prune -o \
+        -name package-lock.json -print 2>/dev/null \
+    | sort -u \
+    | while IFS= read -r lockfile; do \
+        package_dir="$(dirname "$lockfile")"; \
+        if [ -f "$package_dir/package.json" ]; then \
+            echo "[node-deps] Installing $package_dir"; \
+            (cd "$package_dir" && npm ci --omit=dev --no-audit --no-fund); \
+        fi; \
+    done
 
 # Agent Zero extension repository bootstrapper (loaded as built-in agent_init extension)
 COPY extensions/agent_init/_05_extension_repo_bootstrap.py /a0/extensions/python/agent_init/_05_extension_repo_bootstrap.py

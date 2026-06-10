@@ -106,36 +106,55 @@ fi
 # ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
-# Restore bundled WhatsApp bridge dependencies when the active Agent Zero tree
-# matches the image-bundled tree. The development branch overlay removes
-# /a0/plugins/.../node_modules, but the bridge stops after repeated runtime npm
-# failures, so use the preinstalled image cache whenever it is safe to do so.
+# Restore bundled Node dependencies when the active Agent Zero tree matches the
+# image-bundled tree. The development branch overlay removes node_modules from
+# /a0 package dirs, so use the preinstalled image cache whenever it is safe.
 # ---------------------------------------------------------------------------
-restore_whatsapp_bridge_deps() {
-    local bridge="/a0/plugins/_whatsapp_integration/whatsapp-bridge"
-    local bundled="/git/agent-zero/plugins/_whatsapp_integration/whatsapp-bridge"
+restore_bundled_node_dependencies() {
+    local active_root="/a0"
+    local bundled_root="/git/agent-zero"
 
-    if [ ! -d "$bridge" ] || [ -d "$bridge/node_modules" ] || [ ! -d "$bundled/node_modules" ]; then
+    if [ ! -d "$active_root" ] || [ ! -d "$bundled_root" ]; then
         return
     fi
 
-    for manifest in package.json package-lock.json; do
-        if [ -f "$bridge/$manifest" ] && [ -f "$bundled/$manifest" ]; then
-            if ! cmp -s "$bridge/$manifest" "$bundled/$manifest"; then
-                echo "[whatsapp] Bundled bridge dependencies do not match active bridge; runtime installer will handle it."
-                return
-            fi
-        elif [ -f "$bridge/$manifest" ] || [ -f "$bundled/$manifest" ]; then
-            echo "[whatsapp] Bundled bridge manifest set differs from active bridge; runtime installer will handle it."
-            return
-        fi
-    done
+    find "$bundled_root" \
+        -path '*/node_modules' -prune -o \
+        -name package-lock.json -print 2>/dev/null \
+    | sort \
+    | while IFS= read -r bundled_lock; do
+        local bundled_dir="${bundled_lock%/package-lock.json}"
+        local relative_dir="${bundled_dir#$bundled_root/}"
+        local active_dir="$active_root/$relative_dir"
+        local compatible=1
 
-    cp -a "$bundled/node_modules" "$bridge/node_modules"
-    echo "[whatsapp] Restored bridge node_modules from bundled image cache"
+        if [ ! -d "$active_dir" ] || [ -d "$active_dir/node_modules" ] || [ ! -d "$bundled_dir/node_modules" ]; then
+            continue
+        fi
+
+        for manifest in package.json package-lock.json; do
+            if [ -f "$active_dir/$manifest" ] && [ -f "$bundled_dir/$manifest" ]; then
+                if ! cmp -s "$active_dir/$manifest" "$bundled_dir/$manifest"; then
+                    compatible=0
+                    break
+                fi
+            elif [ -f "$active_dir/$manifest" ] || [ -f "$bundled_dir/$manifest" ]; then
+                compatible=0
+                break
+            fi
+        done
+
+        if [ "$compatible" -ne 1 ]; then
+            echo "[node-deps] Bundled dependencies do not match $relative_dir; runtime installer will handle it."
+            continue
+        fi
+
+        cp -a "$bundled_dir/node_modules" "$active_dir/node_modules"
+        echo "[node-deps] Restored node_modules for $relative_dir from bundled image cache"
+    done
 }
 
-restore_whatsapp_bridge_deps
+restore_bundled_node_dependencies
 # ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
