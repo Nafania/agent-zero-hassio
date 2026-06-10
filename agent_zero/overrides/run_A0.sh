@@ -52,13 +52,14 @@ if [ "$A0_BRANCH" = "development" ]; then
             --exclude='usr' \
             "$A0_SRC/" /a0/
 
-        # Sync application-owned subdirs of usr/ (e.g. plugins) without touching
-        # user-generated data. --exclude='usr' above protects user settings, but
-        # the development branch keeps app code in usr/plugins/ which must exist.
+        # Seed application-owned usr/ subdirs without deleting or overwriting
+        # user data. Plugin Hub installs plugins and OAuth tokens into
+        # /a0/usr/plugins, so --delete here would erase user-installed plugins
+        # and their data on every development-branch restart.
         for app_dir in plugins; do
             if [ -d "$A0_SRC/usr/$app_dir" ]; then
                 mkdir -p "/a0/usr/$app_dir"
-                rsync -a --delete "$A0_SRC/usr/$app_dir/" "/a0/usr/$app_dir/"
+                rsync -a --ignore-existing "$A0_SRC/usr/$app_dir/" "/a0/usr/$app_dir/"
             fi
         done
 
@@ -102,6 +103,39 @@ INSTALL_DEPS
 else
     echo "[branch-selector] Branch: main (latest image — no sync needed)."
 fi
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# Restore bundled WhatsApp bridge dependencies when the active Agent Zero tree
+# matches the image-bundled tree. The development branch overlay removes
+# /a0/plugins/.../node_modules, but the bridge stops after repeated runtime npm
+# failures, so use the preinstalled image cache whenever it is safe to do so.
+# ---------------------------------------------------------------------------
+restore_whatsapp_bridge_deps() {
+    local bridge="/a0/plugins/_whatsapp_integration/whatsapp-bridge"
+    local bundled="/git/agent-zero/plugins/_whatsapp_integration/whatsapp-bridge"
+
+    if [ ! -d "$bridge" ] || [ -d "$bridge/node_modules" ] || [ ! -d "$bundled/node_modules" ]; then
+        return
+    fi
+
+    for manifest in package.json package-lock.json; do
+        if [ -f "$bridge/$manifest" ] && [ -f "$bundled/$manifest" ]; then
+            if ! cmp -s "$bridge/$manifest" "$bundled/$manifest"; then
+                echo "[whatsapp] Bundled bridge dependencies do not match active bridge; runtime installer will handle it."
+                return
+            fi
+        elif [ -f "$bridge/$manifest" ] || [ -f "$bundled/$manifest" ]; then
+            echo "[whatsapp] Bundled bridge manifest set differs from active bridge; runtime installer will handle it."
+            return
+        fi
+    done
+
+    cp -a "$bundled/node_modules" "$bridge/node_modules"
+    echo "[whatsapp] Restored bridge node_modules from bundled image cache"
+}
+
+restore_whatsapp_bridge_deps
 # ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------

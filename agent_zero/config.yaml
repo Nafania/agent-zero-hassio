@@ -1,5 +1,5 @@
 name: Agent Zero
-version: "1.20"
+version: "1.20.1"
 slug: agent_zero
 description: AI Assistant - Autonomous agent framework
 arch:
